@@ -1,6 +1,9 @@
-# panoramix-opensource-template
+# sigop-rs
 
-Project description goes here as well as the goal trying to achieve.
+A CLI tool to optimize your Solidity function signatures. I wanted to create this after seeing
+[transmissions11](https://github.com/transmissions11)'s comment about this optimisation.
+
+[Purely based on the work of emn178](https://github.com/emn178/solidity-optimize-name).
 
 ## How does it work ?
 
