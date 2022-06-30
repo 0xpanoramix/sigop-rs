@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "sigop-cli",
+    "sigop-core"
+]
