@@ -14,39 +14,74 @@ pub mod optimizer {
         /// If the function signature contains at least the target number of zeros at the beginning,
         /// the optimization is found.
         pub fn try_optimizations(&self, level: u8, target: u8) -> Option<String> {
+            // Used by the accumulator to create combinations.
             let dictionary = vec![
                 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
                 "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
                 "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
-                "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+                "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "$", "_",
             ];
+            // The vector which contains all combinations from previous round.
+            // Used to accumulate combinations trough time.
             let mut acc: Vec<String> = dictionary.iter().map(|&c| c.to_string()).collect();
+            // The vector which contains all combinations from current round.
+            let mut cur: Vec<String> = vec![];
+
+            // Used to hold the function signature selector.
             let mut out = [0u8; 4];
+            // Used by the string allocator later on.
+            let func_sig_len = self.name.len() + self.args.len() + 1;
+            // Used to avoid multiple dereferences.
+            let name = &*self.name;
+            let args = &*self.args;
 
+            // For every suffix length until we reach level.
             for _n in 0..level {
-                // Trying optimizations using combinations.
+                // For each element of the accumulator.
                 for item in &acc {
-                    encode_function_signature(
-                        format!("{}_{}{}", self.name, item, self.args).as_str(),
-                        &mut out,
-                    );
+                    // Declared here to avoid calling this multiple times in the next nested loop
+                    // below.
+                    let item_len = item.len();
 
-                    let mut found = true;
-                    for i in 0..target {
-                        if out[i as usize] != 0 {
-                            found = false;
-                            break;
+                    // Now we iterate in each element of the dictionary.
+                    for next in &dictionary {
+                        // Used by the string allocator just below.
+                        let combination_len = item_len + next.len();
+
+                        // The combination contains the concatenation of item and next.
+                        // We use with_capacity because it's faster compared to the format macro.
+                        let mut combination = String::with_capacity(combination_len);
+                        combination.push_str(item);
+                        combination.push_str(next);
+
+                        // It's faster compared to the format macro here too.
+                        let mut func_sig = String::with_capacity(combination_len + func_sig_len);
+                        func_sig.push_str(name);
+                        func_sig.push('_');
+                        func_sig.push_str(&*combination);
+                        func_sig.push_str(args);
+                        encode_function_signature(func_sig.as_str(), &mut out);
+
+                        // Checks if the first elements are zeros.
+                        let mut found = true;
+                        for i in 0..target {
+                            if out[i as usize] != 0 {
+                                found = false;
+                                break;
+                            }
                         }
-                    }
-                    if found {
-                        return Some(format!("{}_{}{}", self.name, item, self.args));
+                        if found {
+                            return Some(func_sig);
+                        }
+
+                        // We push the new combination in the current (temporary) vector.
+                        cur.push(combination);
                     }
                 }
-
-                acc = acc
-                    .into_iter()
-                    .flat_map(|c| dictionary.iter().map(move |&d| d.to_owned() + &*c))
-                    .collect();
+                // Replaces the accumulator with new combinations from this round and clean-up the
+                // temporary vector.
+                acc = cur.to_owned();
+                cur.clear();
             }
             None
         }
