@@ -54,6 +54,26 @@ $ cast sig "myFunction_LYq3(address)"
 0x0000006d
 ```
 
+### Results
+
+Using Remix, we can track the gas cost of calling these functions:
+```shell
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.14;
+
+contract Test {
+    // Execution cost : 22132
+    function myFunction(address a) public pure returns (address) {
+        return a;
+    }
+
+    // Execution cost : 22074
+    function myFunction_LYq3(address a) public pure returns (address) {
+        return a;
+    }
+}
+```
+
 ## 🤖 Author
 
 Made with ❤️ by 🤖 [Luca Georges François](https://github.com/0xpanoramix) 🤖
