@@ -8,7 +8,7 @@ fn main() {
             println!("Either none optimization was found or an error has occurred")
         }
         Some(res) => {
-            println!("Found this optimisation: {}", res)
+            println!("Found this optimization: {}", res)
         }
     }
 }

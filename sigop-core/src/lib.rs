@@ -13,7 +13,7 @@ pub mod optimizer {
         /// signature for each one of them.
         /// If the function signature contains at least the target number of zeros at the beginning,
         /// the optimization is found.
-        pub fn try_optimisations(&self, level: u8, target: u8) -> Option<String> {
+        pub fn try_optimizations(&self, level: u8, target: u8) -> Option<String> {
             let dictionary = vec![
                 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
                 "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
@@ -24,7 +24,7 @@ pub mod optimizer {
             let mut out = [0u8; 4];
 
             for _n in 0..level {
-                // Trying optimisations using combinations.
+                // Trying optimizations using combinations.
                 for item in &acc {
                     encode_function_signature(
                         format!("{}_{}{}", self.name, item, self.args).as_str(),
@@ -78,7 +78,7 @@ pub mod optimizer {
     pub fn run(function_signature: &str, level: u8, target: u8) -> Option<String> {
         let function = try_parse(function_signature)?;
 
-        function.try_optimisations(level, target)
+        function.try_optimizations(level, target)
     }
 
     #[cfg(test)]
@@ -95,14 +95,14 @@ pub mod optimizer {
         }
 
         #[test]
-        fn it_tries_optimisations() {
+        fn it_tries_optimizations() {
             let f = Function {
                 name: "myFunction".to_string(),
                 args: "(address)".to_string(),
             };
 
-            let optimisation = f.try_optimisations(3, 2);
-            assert_eq!(true, optimisation.is_some());
+            let optimization = f.try_optimizations(3, 2);
+            assert_eq!(true, optimization.is_some());
         }
 
         #[test]
