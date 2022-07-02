@@ -7,5 +7,7 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "3.2.8", features = ["derive"] }
+log = "0.4.17"
+env_logger = "0.9.0"
 
 sigop-core = { path = "../sigop-core" }
