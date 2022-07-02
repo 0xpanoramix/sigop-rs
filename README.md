@@ -30,7 +30,7 @@ env RUST_LOG=info ./target/release/sigop-cli -s "myFunction(address)"
 
 Which should print:
 ```shell
-[2022-07-02T13:54:59Z INFO  sigop_cli] Found this optimization: myAwesomeFunction_BU$(address)
+[2022-07-02T13:54:59Z INFO  sigop_cli] Found this optimization: myFunction_6mI(address)
 ```
 
 Using `cast`, we can see the optimized function selector:
