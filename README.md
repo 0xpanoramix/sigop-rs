@@ -25,18 +25,18 @@ cargo build --release --all-features
 ### 🏁 Quickstart
 
 ```shell
-env RUST_LOG=info ./target/release/sigop-cli -s "myAwesomeFunction(address)"
+env RUST_LOG=info ./target/release/sigop-cli -s "myFunction(address)"
 ```
 
 Which should print:
 ```shell
-[2022-07-02T13:54:59Z INFO  sigop_cli] Found this optimization: myAwesomeFunction_Gh5(address)
+[2022-07-02T13:54:59Z INFO  sigop_cli] Found this optimization: myAwesomeFunction_BU$(address)
 ```
 
 Using `cast`, we can see the optimized function selector:
 ```shell
-$ cast sig "myAwesomeFunction_Gh5(address)"
-0x0000983d
+$ cast sig "myFunction_6mI(address)"
+0x00001926
 ```
 
 ### ✏️ Custom parameters
@@ -45,6 +45,14 @@ You can specify custom parameters used by the optimizer:
 1. `level`: The maximum size of the suffix following the original function name.
 2. `target`: The number of zero-bytes you want to have at the beginning of the optimized function
 selector.
+
+Example:
+```shell
+$ ./sigop-cli -s "myFunction(address)" --level=4 --target=3
+[2022-07-02T18:12:18Z INFO  sigop_cli] Found this optimization: myFunction_LYq3(address)
+$ cast sig "myFunction_LYq3(address)"
+0x0000006d
+```
 
 ## 🤖 Author
 
