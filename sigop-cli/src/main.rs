@@ -17,6 +17,10 @@ struct Cli {
     /// The number of zero-bytes you want to have at the beginning of the optimized function.
     #[clap(short, long, default_value_t = 2)]
     target: u8,
+
+    /// Prints a progression bar for iterations.
+    #[clap(short, long, action)]
+    debug: bool,
 }
 
 fn main() {
@@ -27,7 +31,7 @@ fn main() {
     builder.init();
 
     let cli = Cli::parse();
-    let optimized = run(&cli.signature, cli.level, cli.target);
+    let optimized = run(&cli.signature, cli.level, cli.target, cli.debug);
 
     match optimized {
         None => {
