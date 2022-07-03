@@ -1,4 +1,5 @@
 pub mod optimizer {
+    use indicatif::ProgressBar;
     use regex::Regex;
     use sha3::{Digest, Keccak256};
 
@@ -13,7 +14,7 @@ pub mod optimizer {
         /// signature for each one of them.
         /// If the function signature contains at least the target number of zeros at the beginning,
         /// the optimization is found.
-        pub fn try_optimizations(&self, level: u8, target: u8) -> Option<String> {
+        pub fn try_optimizations(&self, level: u8, target: u8, debug: bool) -> Option<String> {
             // Used by the accumulator to create combinations.
             let dictionary = vec![
                 "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f",
@@ -27,6 +28,14 @@ pub mod optimizer {
             // The vector which contains all combinations from current round.
             let mut cur: Vec<String> = vec![];
 
+            // Debug.
+            let dictionary_len = dictionary.len();
+            let max_iterations: u64 = (0..=level)
+                .into_iter()
+                .map(|n| dictionary_len.pow(n as u32) as u64)
+                .sum();
+            let pb = ProgressBar::new(max_iterations);
+
             // Used to hold the function signature selector.
             let mut out = [0u8; 4];
             // Used by the string allocator later on.
@@ -39,6 +48,11 @@ pub mod optimizer {
             for _n in 0..level {
                 // For each element of the accumulator.
                 for item in &acc {
+                    if debug {
+                        // Debug progress.
+                        pb.inc(1);
+                    }
+
                     // Declared here to avoid calling this multiple times in the next nested loop
                     // below.
                     let item_len = item.len();
@@ -110,10 +124,10 @@ pub mod optimizer {
 
     /// Runs the optimizer on the given function signature.
     /// The level and target are used to indicate the optimizer when it should stop.
-    pub fn run(function_signature: &str, level: u8, target: u8) -> Option<String> {
+    pub fn run(function_signature: &str, level: u8, target: u8, debug: bool) -> Option<String> {
         let function = try_parse(function_signature)?;
 
-        function.try_optimizations(level, target)
+        function.try_optimizations(level, target, debug)
     }
 
     #[cfg(test)]
@@ -136,7 +150,7 @@ pub mod optimizer {
                 args: "(address)".to_string(),
             };
 
-            let optimization = f.try_optimizations(3, 2);
+            let optimization = f.try_optimizations(3, 2, false);
             assert_eq!(true, optimization.is_some());
         }
 
