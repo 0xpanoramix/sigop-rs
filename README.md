@@ -25,7 +25,7 @@ cargo build --release --all-features
 ### 🏁 Quickstart
 
 ```shell
-env RUST_LOG=info ./target/release/sigop-cli -s "myFunction(address)"
+./target/release/sigop-cli -s "myFunction(address)"
 ```
 
 Which should print:
