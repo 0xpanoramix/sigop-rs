@@ -1,5 +1,6 @@
 pub mod optimizer {
     use indicatif::ProgressBar;
+    use log::error;
     use regex::Regex;
     use sha3::{Digest, Keccak256};
 
@@ -122,17 +123,58 @@ pub mod optimizer {
         }
     }
 
+    // Makes sure there are no issues with parenthesis in the initial function signature.
+    fn verify_parenthesis(function_sig: &str) -> bool {
+        // The function signature must end with a closing parenthesis.
+        if !function_sig.ends_with(')') {
+            error!("last character must be a closing parenthesis");
+            return false;
+        }
+
+        // There must be the same number of opening and closing parenthesis.
+        if function_sig.matches('(').count() != function_sig.matches(')').count() {
+            error!("number of opening parenthesis differs from number of closing parenthesis");
+            return false;
+        }
+
+        true
+    }
+
+    /// Used to remove whitespaces from the given function signature.
+    fn remove_whitespaces(s: &str) -> String {
+        s.chars().filter(|c| !c.is_whitespace()).collect()
+    }
+
+    // Tries to validate initial function signature.
+    fn try_validate(function_sig: &str) -> Option<String> {
+        let result = remove_whitespaces(function_sig);
+
+        if !verify_parenthesis(result.as_str()) {
+            return None;
+        }
+        Some(result)
+    }
+
+    fn try_preprocess(function_signature: &str) -> Option<Function> {
+        let function_signature_cleaned = try_validate(function_signature)?;
+        let function = try_parse(function_signature_cleaned.as_str())?;
+
+        Some(function)
+    }
+
     /// Runs the optimizer on the given function signature.
     /// The level and target are used to indicate the optimizer when it should stop.
     pub fn run(function_signature: &str, level: u8, target: u8, debug: bool) -> Option<String> {
-        let function = try_parse(function_signature)?;
+        let function = try_preprocess(function_signature)?;
 
         function.try_optimizations(level, target, debug)
     }
 
     #[cfg(test)]
     mod tests {
-        use crate::optimizer::{encode_function_signature, try_parse, Function};
+        use crate::optimizer::{
+            encode_function_signature, remove_whitespaces, try_parse, verify_parenthesis, Function,
+        };
 
         #[test]
         fn it_encodes_function_signature() {
@@ -172,6 +214,38 @@ pub mod optimizer {
             assert_eq!(true, function.is_some());
             assert_eq!("myFunction", function.as_ref().unwrap().name);
             assert_eq!("((address,uint256))", function.as_ref().unwrap().args)
+        }
+
+        #[test]
+        fn it_removes_whitespaces() {
+            let original = "myFunction ( address) ";
+            let result = remove_whitespaces(original);
+
+            assert_eq!("myFunction(address)", result)
+        }
+
+        #[test]
+        fn it_verifies_ending_character() {
+            let function_sig = "myFunction(address";
+            let result = verify_parenthesis(function_sig);
+
+            assert_eq!(false, result)
+        }
+
+        #[test]
+        fn it_verifies_parenthesis_count() {
+            let function_sig = "myFunction((address)";
+            let result = verify_parenthesis(function_sig);
+
+            assert_eq!(false, result)
+        }
+
+        #[test]
+        fn it_validates_parenthesis_criteria() {
+            let function_sig = "myFunction(address)";
+            let result = verify_parenthesis(function_sig);
+
+            assert_eq!(true, result)
         }
     }
 }
