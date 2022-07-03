@@ -1,5 +1,6 @@
 use clap::Parser;
-use log::{info, warn};
+use env_logger::Builder;
+use log::{info, warn, LevelFilter};
 use sigop_core::optimizer::run;
 
 #[derive(Parser)]
@@ -19,7 +20,11 @@ struct Cli {
 }
 
 fn main() {
-    env_logger::init();
+    let mut builder = Builder::new();
+
+    builder.filter_level(LevelFilter::Info);
+    builder.parse_default_env();
+    builder.init();
 
     let cli = Cli::parse();
     let optimized = run(&cli.signature, cli.level, cli.target);
