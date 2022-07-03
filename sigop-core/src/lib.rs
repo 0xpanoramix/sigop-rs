@@ -1,4 +1,7 @@
+mod validator;
+
 pub mod optimizer {
+    use crate::validator::try_validate;
     use indicatif::ProgressBar;
     use regex::Regex;
     use sha3::{Digest, Keccak256};
@@ -125,7 +128,8 @@ pub mod optimizer {
     /// Runs the optimizer on the given function signature.
     /// The level and target are used to indicate the optimizer when it should stop.
     pub fn run(function_signature: &str, level: u8, target: u8, debug: bool) -> Option<String> {
-        let function = try_parse(function_signature)?;
+        let function_signature_cleaned = try_validate(function_signature)?;
+        let function = try_parse(function_signature_cleaned.as_str())?;
 
         function.try_optimizations(level, target, debug)
     }
