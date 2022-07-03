@@ -1,4 +1,9 @@
-# sigop-rs
+<h1 align="center">
+        sigop-rs
+    </h1>
+<p align="center">
+    <img src=".github/assets/demo.gif" />
+</p>
 
 A CLI tool to optimize your Solidity function signatures. I wanted to create this after seeing
 [transmissions11](https://github.com/transmissions11)'s comment about this optimization.
